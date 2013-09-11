@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+      var websocket;
+      $(function() {
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+        websocket = new WebSocket('ws://192.168.1.7:7681', 'http-only');
+
+        websocket.onopen = function () {
+          $('h1').css('color', 'green');
+        };
+
+        websocket.onerror = function () {
+          $('h1').css('color', 'red');
+        };
+
+        websocket.onmessage = function (message) {
+          console.log(message.data);
+          $('div').append($('<p>', { text: message.data }));
+        };
+      });
+
+      function handleKeys(e) {
+        var character;
+        var evt = (e) ? e : window.event;
+        character = (evt.charCode) ? evt.charCode : evt.keyCode;
+        if (character > 31 && character < 256 && character != old) {
+          // console.log(character);
+          if (character === 87) {
+            websocket.send("w");
+            old = character;
+          }
+          else if (character === 83) {
+            websocket.send("s");
+            old = character;
+          }
+          else if (character === 65) {
+            websocket.send("a");
+            old = character;
+          }
+          else if (character === 68) {
+            websocket.send("d");
+            old = character;
+          }
+        }
+      }
+
+      function releaseKeys(e) {
+        websocket.send("x");
+        old = 88;
+      }
+    </script>
+  </head>
+  <body>
+    <h1>WebSockets test - NUTS</h1>
+    <img src="http://192.168.1.7:8081" width="640" height="480"></img>
+    <div></div>
+  </body>
+  <script>
+  var old = 0;
+  document.onkeydown = function(e) {handleKeys(e)}
+  document.onkeyup = function(e) {releaseKeys(e)}
+  </script>
+</html>
